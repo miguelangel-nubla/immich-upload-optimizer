@@ -1,0 +1,66 @@
+tasks:
+  # Images: Resize to max 16MP, encode to JXL, restore metadata
+  - name: images-magick-jxl
+    command: >
+      magick "{{.folder}}/{{.name}}.{{.extension}}"
+      -auto-orient
+      -resize 4096x4096\>
+      ppm:- |
+      cjxl - "{{.folder}}/{{.name}}-new.jxl"
+      -q 80
+      --effort=7
+      && exiftool -overwrite_original
+      -tagsfromfile "{{.folder}}/{{.name}}.{{.extension}}"
+      -all:all -m -Orientation=1 "{{.folder}}/{{.name}}-new.jxl"
+      && rm "{{.folder}}/{{.name}}.{{.extension}}"
+    extensions:
+      - avif
+      - bmp
+      - gif
+      - heic
+      - heif
+      - jpeg
+      - jpg
+      - png
+      - tiff
+      - tif
+      - webp
+
+  # Videos: ffmpeg with hwaccel from AMD iGPU.
+  - name: videos-ffmpeg
+    command: >
+      ffmpeg
+      -hwaccel vaapi
+      -hwaccel_device /dev/dri/renderD128
+      -i "{{.folder}}/{{.name}}.{{.extension}}"
+      -vf "scale='if(gt(iw,ih),min(1920,iw),-2)':'if(gt(ih,iw),min(1920,ih),-2)':flags=lanczos,format=p010,hwupload"
+      -c:v hevc_vaapi -profile:v main10 -qp 22
+      -c:a libopus -b:a 128k
+      "{{.folder}}/{{.name}}-new.mp4"
+      && exiftool -overwrite_original
+      -tagsfromfile "{{.folder}}/{{.name}}.{{.extension}}"
+      -all:all -m -Orient "{{.folder}}/{{.name}}-new.mp4"
+      &&
+      rm "{{.folder}}/{{.name}}.{{.extension}}"
+    extensions:
+      - 3gp
+      - 3gpp
+      - avi
+      - av1
+      - flv
+      - hevc
+      - insv
+      - m2t
+      - m2ts
+      - m4v
+      - mkv
+      - mod
+      - mov
+      - mpe
+      - mpg
+      - mp4
+      - mts
+      - tod
+      - ts
+      - webm
+      - wmv

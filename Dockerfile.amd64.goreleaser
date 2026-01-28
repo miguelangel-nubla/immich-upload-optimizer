@@ -17,7 +17,7 @@ RUN CAESIUM_LATEST_RELEASE=$(curl -s https://api.github.com/repos/$CAESIUM_GITHU
 FROM jlesage/handbrake:latest
 
 RUN apk update
-RUN apk add jq curl vips-tools exiftool ffmpeg imagemagick libc6-compat libjxl-tools libheif libde265
+RUN apk add jq curl vips-tools exiftool ffmpeg imagemagick libc6-compat libjxl-tools libheif libde265 libva libva-utils mesa-va-gallium
 
 COPY --from=builder /usr/local/bin/caesiumclt /usr/local/bin/caesiumclt
 

@@ -18,7 +18,7 @@ FROM debian:sid-slim
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq -y install jq curl libjxl-tools libvips-tools exiftool
-RUN DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -qq -y install handbrake-cli ffmpeg imagemagick
+RUN DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -qq -y install handbrake-cli ffmpeg imagemagick vainfo libva2 libva-drm2 mesa-va-drivers
 
 COPY --from=builder /usr/local/bin/caesiumclt /usr/local/bin/caesiumclt
 
