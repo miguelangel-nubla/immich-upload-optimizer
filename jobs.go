@@ -20,7 +20,7 @@ func newJob(r *http.Request, w http.ResponseWriter, logger *customLogger) (err e
 	// Redirect support is necessary as file processing can take a long time and the client risks a timeout on the http request.
 	// Currently no way to check for redirect support so blacklist these user agents.
 	// Ideally redirect support is added here: https://github.com/immich-app/immich/blob/f6cbc9db06c0783d09f154f66e12d041032fff62/cli/src/commands/asset.ts#L290
-	brokenRedirectUserAgents := []string{"Dart/", "Dalvik/"}
+	brokenRedirectUserAgents := []string{"Dart/", "Dalvik/", "Immich"}
 	clientFollowsRedirects := true
 	for _, userAgent := range brokenRedirectUserAgents {
 		if strings.HasPrefix(r.UserAgent(), userAgent) {
