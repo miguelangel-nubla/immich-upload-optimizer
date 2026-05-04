@@ -5,12 +5,14 @@ RUN apt-get update && \
 ARG TARGETPLATFORM
 
 ARG CAESIUM_GITHUB_REPO=Lymphatus/caesium-clt
-RUN CAESIUM_LATEST_RELEASE=$(curl -s https://api.github.com/repos/$CAESIUM_GITHUB_REPO/releases/latest | jq -r '.tag_name') \
+RUN set -e; \
+    CAESIUM_LATEST_RELEASE=$(curl -sSfL https://api.github.com/repos/$CAESIUM_GITHUB_REPO/releases/latest | jq -r '.tag_name') \
+    && if [ "$CAESIUM_LATEST_RELEASE" = "null" ] || [ -z "$CAESIUM_LATEST_RELEASE" ]; then echo "Failed to fetch latest release tag"; exit 1; fi \
     && if [ "$TARGETPLATFORM" = "linux/amd64" ]; then CAESIUM_ARCH=x86_64-unknown-linux-musl; \
        elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then CAESIUM_ARCH=aarch64-unknown-linux-musl; \
        else echo "Platform not supported by ${CAESIUM_GITHUB_REPO}"; exit 126; fi \
     && CAESIUM_ARCHIVE=caesiumclt-${CAESIUM_LATEST_RELEASE}-${CAESIUM_ARCH} \
-    && curl -sS -L -O --output-dir /tmp/ --create-dirs  "https://github.com/$CAESIUM_GITHUB_REPO/releases/latest/download/${CAESIUM_ARCHIVE}.tar.gz" \
+    && curl -sSfL -O --output-dir /tmp/ --create-dirs "https://github.com/$CAESIUM_GITHUB_REPO/releases/download/${CAESIUM_LATEST_RELEASE}/${CAESIUM_ARCHIVE}.tar.gz" \
     && tar xzf "/tmp/${CAESIUM_ARCHIVE}.tar.gz" -C /tmp \
     && mv "/tmp/${CAESIUM_ARCHIVE}/caesiumclt" /usr/local/bin/caesiumclt
 
