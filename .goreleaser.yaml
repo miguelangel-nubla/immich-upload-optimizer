@@ -17,6 +17,13 @@ builds:
       - arm64
     goarm:
       - 7
+    ignore:
+      - goos: windows
+        goarch: arm
+      - goos: darwin
+        goarch: 386
+      - goos: darwin
+        goarch: arm
 dockers:
   -
     goos: linux
