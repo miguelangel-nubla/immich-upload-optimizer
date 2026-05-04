@@ -20,8 +20,8 @@ RUN set -e; \
 
 FROM jlesage/handbrake:latest
 
-RUN apk update
-RUN apk add jq curl vips-tools exiftool ffmpeg imagemagick libc6-compat libjxl-tools libheif libde265
+RUN apk update && \
+    apk add --no-cache jq curl vips-tools exiftool ffmpeg imagemagick libc6-compat libjxl-tools libheif libde265
 
 COPY --from=builder /usr/local/bin/caesiumclt /usr/local/bin/caesiumclt
 

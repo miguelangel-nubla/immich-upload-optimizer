@@ -18,11 +18,12 @@ RUN set -e; \
     && tar xzf "/tmp/${CAESIUM_ARCHIVE}.tar.gz" -C /tmp \
     && mv "/tmp/${CAESIUM_ARCHIVE}/caesiumclt" /usr/local/bin/caesiumclt
 
-FROM debian:sid-slim
+FROM ubuntu:24.04
 
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -qq -y install jq curl libjxl-tools libvips-tools exiftool
-RUN DEBIAN_FRONTEND=noninteractive apt-get --no-install-recommends -qq -y install handbrake-cli ffmpeg imagemagick
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get -qq -y install --no-install-recommends \
+    jq curl libjxl-tools libvips-tools exiftool handbrake-cli ffmpeg imagemagick \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/bin/caesiumclt /usr/local/bin/caesiumclt
 
