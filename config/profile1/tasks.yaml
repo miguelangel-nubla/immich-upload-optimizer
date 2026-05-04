@@ -32,7 +32,16 @@ tasks:
       - gif
 
   - name: handbrake
-    command: HandBrakeCLI --preset-import-file handbrake.json -Z immich-upload-optimizer -i {{.folder}}/{{.name}}.{{.extension}} -o {{.folder}}/{{.name}}-new.mkv && rm {{.folder}}/{{.name}}.{{.extension}}
+    command: >
+      HandBrakeCLI --preset-import-file handbrake.json -Z immich-upload-optimizer \
+        -i {{.folder}}/{{.name}}.{{.extension}} \
+        -o {{.folder}}/{{.name}}.temp.mp4 \
+      && ffmpeg \
+        -i {{.folder}}/{{.name}}.temp.mp4 \
+        -i {{.folder}}/{{.name}}.{{.extension}} \
+        -map 0 -map_metadata 1 -c copy -y \
+        {{.folder}}/{{.name}}-new.mp4 \
+      && rm {{.folder}}/{{.name}}.temp.mp4 {{.folder}}/{{.name}}.{{.extension}}
     extensions:
       - 3gp
       - 3gpp
