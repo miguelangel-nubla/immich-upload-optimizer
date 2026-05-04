@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/spf13/viper"
 )
@@ -27,6 +28,7 @@ var (
 	semaphore             = make(chan struct{}, maxConcurrentRequests)
 )
 
+var jobsMu sync.Mutex
 var jobChannels = make(map[string]chan *http.Response)
 var jobChannelsComplete = make(map[string]chan struct{})
 

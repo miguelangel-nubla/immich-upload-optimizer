@@ -48,14 +48,19 @@ func newJob(r *http.Request, w http.ResponseWriter, logger *customLogger) (err e
 	jobLogger.Printf("uploaded %s %s", formFileHeader.Filename, humanReadableSize(formFileHeader.Size))
 
 	// Create the channels for this job
-	jobChannels[jobID] = make(chan *http.Response)
-	jobChannelsComplete[jobID] = make(chan struct{})
+	jobRespCh := make(chan *http.Response)
+	jobDoneCh := make(chan struct{}, 1)
+	jobsMu.Lock()
+	jobChannels[jobID] = jobRespCh
+	jobChannelsComplete[jobID] = jobDoneCh
+	jobsMu.Unlock()
 
 	cleanup1 := func() {
-		close(jobChannels[jobID])
+		jobsMu.Lock()
 		delete(jobChannels, jobID)
-		close(jobChannelsComplete[jobID])
 		delete(jobChannelsComplete, jobID)
+		jobsMu.Unlock()
+		close(jobRespCh)
 	}
 
 	// Redirect the user to the job wait page
@@ -201,11 +206,11 @@ func newJob(r *http.Request, w http.ResponseWriter, logger *customLogger) (err e
 
 		// Send the response back to the client via the wait page
 		select {
-		case jobChannels[jobID] <- resp:
+		case jobRespCh <- resp:
 			// Wait for the response to be sent to the client before cleaning up or timeout.
 			// This is to avoid all the deferred functions to run before the response is fully sent.
 			select {
-			case <-jobChannelsComplete[jobID]:
+			case <-jobDoneCh:
 				jobLogger.Printf("response sent to client")
 			case <-time.After(10 * time.Second):
 				jobLogger.Printf("timeout before response was fully sent to client")
@@ -220,7 +225,10 @@ func newJob(r *http.Request, w http.ResponseWriter, logger *customLogger) (err e
 
 func continueJob(r *http.Request, w http.ResponseWriter, requestLogger *customLogger) {
 	jobID := r.URL.Query().Get("job")
+	jobsMu.Lock()
 	jobChannel, exists := jobChannels[jobID]
+	jobCompleteCh, _ := jobChannelsComplete[jobID]
+	jobsMu.Unlock()
 	if jobID == "" || !exists {
 		http.Error(w, "job not found", http.StatusBadRequest)
 		return
@@ -258,7 +266,7 @@ func continueJob(r *http.Request, w http.ResponseWriter, requestLogger *customLo
 		if err != nil {
 			jobLogger.Printf("unable to forward response back to client: %v", err)
 		}
-		jobChannelsComplete[jobID] <- struct{}{}
+		jobCompleteCh <- struct{}{}
 	case <-time.After(safeClientTimeout):
 		http.Redirect(w, r, r.URL.String(), http.StatusTemporaryRedirect)
 		jobLogger.Printf("still running, sending redirect to avoid client timeout: %s", r.URL)
