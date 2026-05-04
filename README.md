@@ -44,6 +44,7 @@ By default video conversion is disabled since no known lossless video transcodin
           - IUO_UPSTREAM=http://immich-server:2283
         depends_on:
           - immich-server
+        restart: always
 
       immich-server:
         # ...existing configuration...

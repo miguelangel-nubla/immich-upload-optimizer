@@ -86,6 +86,7 @@ services:
       - IUO_UPSTREAM=http://immich-server:2283
     depends_on:
       - immich-server
+    restart: always
 ```
 
 ## Additional Notes
