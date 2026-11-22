@@ -1,5 +1,20 @@
 # Immich Upload Optimizer
 
+> [!IMPORTANT]
+> **This project is replaced by [immich-optimizer](https://github.com/miguelangel-nubla/immich-optimizer).** It gets no more updates: v0.5.6 is its last release.
+>
+> The new project does what this one did, and what was asked for here most:
+>
+> - **The mobile app no longer uploads converted photos again.**
+> - **It can convert the library you already have**, not only new uploads.
+> - A failed conversion never loses a file, and a long one is no longer cut off.
+>
+> **New here?** Start with its [quick start](https://github.com/miguelangel-nubla/immich-optimizer/blob/main/docs/quickstart.md).
+>
+> **Already using this project?** Moving is not a plain image swap: follow the [migration guide](https://github.com/miguelangel-nubla/immich-optimizer/blob/main/docs/migration.md). It needs Immich 3.x. To stay on this project for now, pin the image to `ghcr.io/miguelangel-nubla/immich-upload-optimizer:v0.5.6` instead of `:latest`.
+>
+> What follows documents this project's last version, for those still running it.
+
 Immich Upload Optimizer is a proxy designed to be placed in front of the Immich server. It intercepts file uploads and uses an external CLI program (by default [JPEG-XL](https://github.com/libjxl/libjxl), [Caesium](https://github.com/Lymphatus/caesium-clt) and [HandBrake](https://github.com/HandBrake/HandBrake)) to optimize, resize, or compress images and videos before they are stored on the Immich server. This helps save storage space on the Immich server by reducing the size of uploaded files.
 
 ## 🌟 Support the Project  

@@ -131,6 +131,7 @@ func main() {
 	}
 
 	log.Printf("Starting %s on %s...", printVersion(), listenAddr)
+	logRetirementNotice()
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatalf("Error starting immich-upload-optimizer: %v", err)
 	}
@@ -138,4 +139,17 @@ func main() {
 
 func printVersion() string {
 	return fmt.Sprintf("immich-upload-optimizer %s, commit %s, built at %s", version, commit, date)
+}
+
+// logRetirementNotice tells whoever reads the log that this project is no
+// longer developed, and where to go. It changes nothing else.
+func logRetirementNotice() {
+	for _, line := range []string{
+		"NOTICE: immich-upload-optimizer is no longer developed. This is its last release.",
+		"NOTICE: It is replaced by immich-optimizer: https://github.com/miguelangel-nubla/immich-optimizer",
+		"NOTICE: Moving to it is not a plain image swap. Migration guide: https://github.com/miguelangel-nubla/immich-optimizer/blob/main/docs/migration.md",
+		"NOTICE: To stay on this project, pin the image to :v0.5.6 instead of :latest.",
+	} {
+		log.Print(line)
+	}
 }
